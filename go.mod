@@ -1,4 +1,4 @@
-module github.com/casdoor/casdoor-go-sdk
+module github.com/puleap/casdoor-go-sdk
 
 go 1.17
 
