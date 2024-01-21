@@ -17,6 +17,7 @@ package casdoorsdk
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 )
 
 type AccountItem struct {
@@ -104,6 +105,32 @@ func (c *Client) GetOrganizations() ([]*Organization, error) {
 		return nil, err
 	}
 	return organizations, nil
+}
+
+func (c *Client) GetPaginationOrganizations(p int, pageSize int, queryMap map[string]string) ([]*Organization, int, error) {
+	queryMap["owner"] = "admin"
+	queryMap["p"] = strconv.Itoa(p)
+	queryMap["pageSize"] = strconv.Itoa(pageSize)
+
+	url := c.GetUrl("get-organizations", queryMap)
+
+	response, err := c.DoGetResponse(url)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	bytes, err := json.Marshal(response.Data)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	var organizations []*Organization
+	err = json.Unmarshal(bytes, &organizations)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return organizations, int(response.Data2.(float64)), nil
 }
 
 func (c *Client) GetOrganizationNames() ([]*Organization, error) {
