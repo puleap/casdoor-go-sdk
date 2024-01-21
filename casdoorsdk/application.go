@@ -23,24 +23,37 @@ type ProviderItem struct {
 	Owner string `json:"owner"`
 	Name  string `json:"name"`
 
-	CanSignUp bool      `json:"canSignUp"`
-	CanSignIn bool      `json:"canSignIn"`
-	CanUnlink bool      `json:"canUnlink"`
-	Prompted  bool      `json:"prompted"`
-	AlertType string    `json:"alertType"`
-	Rule      string    `json:"rule"`
-	Provider  *Provider `json:"provider"`
+	CanSignUp   bool      `json:"canSignUp"`
+	CanSignIn   bool      `json:"canSignIn"`
+	CanUnlink   bool      `json:"canUnlink"`
+	Prompted    bool      `json:"prompted"`
+	SignupGroup string    `json:"signupGroup"`
+	Rule        string    `json:"rule"`
+	Provider    *Provider `json:"provider"`
+}
+
+type SigninMethod struct {
+	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
+	DisplayName string `xorm:"varchar(100)" json:"displayName"`
+	Rule        string `json:"rule"`
 }
 
 type SignupItem struct {
-	Name     string `json:"name"`
-	Visible  bool   `json:"visible"`
-	Required bool   `json:"required"`
-	Prompted bool   `json:"prompted"`
-	Rule     string `json:"rule"`
+	Name        string `json:"name"`
+	Visible     bool   `json:"visible"`
+	Required    bool   `json:"required"`
+	Prompted    bool   `json:"prompted"`
+	Label       string `json:"label"`
+	Placeholder string `json:"placeholder"`
+	Rule        string `json:"rule"`
 }
 
-// Application has the same definition as https://github.com/casdoor/casdoor/blob/master/object/application.go#L24
+type SamlItem struct {
+	Name       string `json:"name"`
+	NameFormat string `json:"nameformat"`
+	Value      string `json:"value"`
+}
+
 type Application struct {
 	Owner       string `xorm:"varchar(100) notnull pk" json:"owner"`
 	Name        string `xorm:"varchar(100) notnull pk" json:"name"`
@@ -58,15 +71,20 @@ type Application struct {
 	EnableAutoSignin    bool            `json:"enableAutoSignin"`
 	EnableCodeSignin    bool            `json:"enableCodeSignin"`
 	EnableSamlCompress  bool            `json:"enableSamlCompress"`
+	EnableSamlC14n10    bool            `json:"enableSamlC14n10"`
 	EnableWebAuthn      bool            `json:"enableWebAuthn"`
 	EnableLinkWithEmail bool            `json:"enableLinkWithEmail"`
 	OrgChoiceMode       string          `json:"orgChoiceMode"`
 	SamlReplyUrl        string          `xorm:"varchar(100)" json:"samlReplyUrl"`
 	Providers           []*ProviderItem `xorm:"mediumtext" json:"providers"`
-	SignupItems         []*SignupItem   `xorm:"varchar(1000)" json:"signupItems"`
+	SigninMethods       []*SigninMethod `xorm:"varchar(2000)" json:"signinMethods"`
+	SignupItems         []*SignupItem   `xorm:"varchar(2000)" json:"signupItems"`
 	GrantTypes          []string        `xorm:"varchar(1000)" json:"grantTypes"`
 	OrganizationObj     *Organization   `xorm:"-" json:"organizationObj"`
+	CertPublicKey       string          `xorm:"-" json:"certPublicKey"`
 	Tags                []string        `xorm:"mediumtext" json:"tags"`
+	InvitationCodes     []string        `xorm:"varchar(200)" json:"invitationCodes"`
+	SamlAttributes      []*SamlItem     `xorm:"varchar(1000)" json:"samlAttributes"`
 
 	ClientId             string     `xorm:"varchar(100)" json:"clientId"`
 	ClientSecret         string     `xorm:"varchar(100)" json:"clientSecret"`
@@ -87,6 +105,9 @@ type Application struct {
 	FormOffset           int        `json:"formOffset"`
 	FormSideHtml         string     `xorm:"mediumtext" json:"formSideHtml"`
 	FormBackgroundUrl    string     `xorm:"varchar(200)" json:"formBackgroundUrl"`
+
+	FailedSigninLimit      int `json:"failedSigninLimit"`
+	FailedSigninfrozenTime int `json:"failedSigninfrozenTime"`
 }
 
 func (c *Client) GetApplications() ([]*Application, error) {
