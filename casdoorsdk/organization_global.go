@@ -38,6 +38,6 @@ func DeleteOrganization(organization *Organization) (bool, error) {
 	return globalClient.DeleteOrganization(organization)
 }
 
-func UpdateOrganization(organization *Organization) (bool, error) {
-	return globalClient.UpdateOrganization(organization)
+func UpdateOrganization(name string, organization *Organization) (bool, error) {
+	return globalClient.UpdateOrganization(name, organization)
 }

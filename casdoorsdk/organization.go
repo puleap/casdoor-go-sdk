@@ -165,8 +165,22 @@ func (c *Client) DeleteOrganization(organization *Organization) (bool, error) {
 	return affected, err
 }
 
-func (c *Client) UpdateOrganization(organization *Organization) (bool, error) {
+func (c *Client) UpdateOrganization(name string, organization *Organization) (bool, error) {
 	organization.Owner = "admin"
-	_, affected, err := c.modifyOrganization("update-organization", organization, nil)
-	return affected, err
+
+	queryMap := map[string]string{
+		"id": fmt.Sprintf("%s/%s", organization.Owner, name),
+	}
+
+	postBytes, err := json.Marshal(organization)
+	if err != nil {
+		return false, err
+	}
+
+	resp, err := c.DoPost("update-organization", queryMap, postBytes, false, false)
+	if err != nil {
+		return false, err
+	}
+
+	return resp.Data == "Affected", nil
 }
