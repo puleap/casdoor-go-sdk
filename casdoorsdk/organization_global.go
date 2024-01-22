@@ -22,6 +22,10 @@ func GetOrganizations() ([]*Organization, error) {
 	return globalClient.GetOrganizations()
 }
 
+func GetPaginationOrganizations(p int, pageSize int, queryMap map[string]string) ([]*Organization, error) {
+	return globalClient.GetPaginationOrganizations(p, pageSize, queryMap)
+}
+
 func GetOrganizationNames() ([]*Organization, error) {
 	return globalClient.GetOrganizationNames()
 }
