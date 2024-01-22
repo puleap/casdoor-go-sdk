@@ -183,8 +183,25 @@ func (c *Client) DeleteApplication(application *Application) (bool, error) {
 	return affected, err
 }
 
-func (c *Client) UpdateApplication(application *Application) (bool, error) {
+func (c *Client) UpdateApplication(name string, application *Application) (bool, error) {
 	application.Owner = "admin"
+
+	queryMap := map[string]string{
+		"id": fmt.Sprintf("%s/%s", application.Owner, name),
+	}
+
+	postBytes, err := json.Marshal(application)
+	if err != nil {
+		return false, err
+	}
+
+	resp, err := c.DoPost("update-application", queryMap, postBytes, false, false)
+	if err != nil {
+		return false, err
+	}
+
+	return resp.Data == "Affected", nil
+
 	_, affected, err := c.modifyApplication("update-application", application, nil)
 	return affected, err
 }
