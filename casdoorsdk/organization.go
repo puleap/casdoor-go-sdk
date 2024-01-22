@@ -59,6 +59,7 @@ type Organization struct {
 	Languages          []string   `xorm:"varchar(255)" json:"languages"`
 	ThemeData          *ThemeData `xorm:"json" json:"themeData"`
 	MasterPassword     string     `xorm:"varchar(100)" json:"masterPassword"`
+	DefaultPassword    string     `xorm:"varchar(100)" json:"defaultPassword"`
 	InitScore          int        `json:"initScore"`
 	EnableSoftDeletion bool       `json:"enableSoftDeletion"`
 	IsProfilePublic    bool       `json:"isProfilePublic"`
