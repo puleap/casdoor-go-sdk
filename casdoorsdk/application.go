@@ -201,7 +201,4 @@ func (c *Client) UpdateApplication(name string, application *Application) (bool,
 	}
 
 	return resp.Data == "Affected", nil
-
-	_, affected, err := c.modifyApplication("update-application", application, nil)
-	return affected, err
 }

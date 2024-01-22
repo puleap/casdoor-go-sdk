@@ -107,9 +107,18 @@ func (c *Client) GetGroup(name string) (*Group, error) {
 	return group, nil
 }
 
-func (c *Client) UpdateGroup(group *Group) (bool, error) {
-	_, affected, err := c.modifyGroup("update-group", group, nil)
-	return affected, err
+func (c *Client) UpdateGroup(name string, group *Group) (bool, error) {
+	queryMap := map[string]string{
+		"id": fmt.Sprintf("%s/%s", group.Owner, name),
+	}
+
+	postBytes, err := json.Marshal(group)
+	if err != nil {
+		return false, err
+	}
+
+	resp, err := c.DoPost("update-group", queryMap, postBytes, false, false)
+	return resp.Data == "Affected", nil
 }
 
 func (c *Client) AddGroup(group *Group) (bool, error) {

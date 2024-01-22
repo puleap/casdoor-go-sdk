@@ -26,8 +26,8 @@ func GetGroup(name string) (*Group, error) {
 	return globalClient.GetGroup(name)
 }
 
-func UpdateGroup(group *Group) (bool, error) {
-	return globalClient.UpdateGroup(group)
+func UpdateGroup(name string, group *Group) (bool, error) {
+	return globalClient.UpdateGroup(name, group)
 }
 
 func AddGroup(group *Group) (bool, error) {
