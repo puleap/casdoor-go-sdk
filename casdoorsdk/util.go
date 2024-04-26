@@ -252,3 +252,59 @@ func (c *Client) doGetBytesRawWithoutCheck(url string) ([]byte, error) {
 
 	return respBytes, nil
 }
+
+func (c *Client) doPostMultipartForm(url string, formData map[string]string) (*Response, error) {
+	var buffer bytes.Buffer
+	multipartWriter := multipart.NewWriter(&buffer)
+
+	for k, v := range formData {
+		fieldWriter, err := multipartWriter.CreateFormField(k)
+		if err != nil {
+			return nil, err
+		}
+		_, err = fieldWriter.Write([]byte(v))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	multipartWriter.Close()
+
+	respBytes, err := c.DoPostBytesRaw(url, multipartWriter.FormDataContentType(), &buffer)
+	if err != nil {
+		return nil, err
+	}
+
+	var response Response
+	err = json.Unmarshal(respBytes, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Status != "ok" {
+		return nil, fmt.Errorf(response.Msg)
+	}
+
+	return &response, nil
+}
+
+func (c *Client) DoPostJson(url string, postBytes []byte) (*Response, error) {
+	body := bytes.NewReader(postBytes)
+
+	respBytes, err := c.DoPostBytesRaw(url, "application/json;charset=utf-8", body)
+	if err != nil {
+		return nil, err
+	}
+
+	var response Response
+	err = json.Unmarshal(respBytes, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Status != "ok" {
+		return nil, fmt.Errorf(response.Msg)
+	}
+
+	return &response, nil
+}

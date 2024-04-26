@@ -23,3 +23,11 @@ func GetOAuthToken(code string, state string) (*oauth2.Token, error) {
 func RefreshOAuthToken(refreshToken string) (*oauth2.Token, error) {
 	return globalClient.RefreshOAuthToken(refreshToken)
 }
+
+func SendVerificationCode(form VerificationForm) error {
+	return globalClient.SendVerificationCode(form)
+}
+
+func Login(form AuthForm) (string, error) {
+	return globalClient.Login(form)
+}

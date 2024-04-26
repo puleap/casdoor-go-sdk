@@ -72,7 +72,7 @@ func TestOrganization(t *testing.T) {
 	// Update the object
 	updatedDisplayName := "Updated Casdoor Website"
 	organization.DisplayName = updatedDisplayName
-	_, err = UpdateOrganization(organization)
+	_, err = UpdateOrganization(organization.Name, organization)
 	if err != nil {
 		t.Fatalf("Failed to update object: %v", err)
 	}

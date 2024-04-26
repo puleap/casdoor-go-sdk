@@ -67,7 +67,7 @@ func TestApplication(t *testing.T) {
 	// Update the object
 	updatedDescription := "Updated Casdoor Website"
 	application.Description = updatedDescription
-	_, err = UpdateApplication(application)
+	_, err = UpdateApplication(application.Name, application)
 	if err != nil {
 		t.Fatalf("Failed to update object: %v", err)
 	}

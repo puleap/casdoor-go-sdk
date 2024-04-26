@@ -16,11 +16,13 @@ package casdoorsdk
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"golang.org/x/oauth2"
 	"net/http"
 	"strings"
+
+	"golang.org/x/oauth2"
 )
 
 // AuthConfig is the core configuration.
@@ -132,4 +134,106 @@ func (c *Client) RefreshOAuthToken(refreshToken string) (*oauth2.Token, error) {
 	}
 
 	return token, err
+}
+
+type VerificationForm struct {
+	Dest          string `json:"dest"`
+	Type          string `json:"type"`
+	CountryCode   string `json:"countryCode"`
+	ApplicationId string `json:"applicationId"`
+	Method        string `json:"method"`
+	CheckUser     string `json:"checkUser"`
+
+	CaptchaType  string `json:"captchaType"`
+	ClientSecret string `json:"clientSecret"`
+	CaptchaToken string `json:"captchaToken"`
+}
+
+func (c *Client) SendVerificationCode(form VerificationForm) error {
+	formData := map[string]string{
+		"dest":          form.Dest,
+		"type":          form.Type,
+		"countryCode":   form.CountryCode,
+		"applicationId": "admin/" + form.ApplicationId,
+		"method":        form.Method,
+		"checkUser":     form.CheckUser,
+		"captchaType":   form.CaptchaType,
+		"clientSecret":  form.ClientSecret,
+		"captchaToken":  form.CaptchaToken,
+	}
+
+	url := c.GetUrl("send-verification-code", nil)
+	resp, err := c.doPostMultipartForm(url, formData)
+	if err != nil {
+		return err
+	}
+	if resp.Status == "error" {
+		return errors.New(resp.Msg)
+	}
+
+	return nil
+}
+
+type AuthForm struct {
+	Type         string `json:"type"`
+	SigninMethod string `json:"signinMethod"`
+
+	Organization   string `json:"organization"`
+	Username       string `json:"username"`
+	Password       string `json:"password"`
+	Name           string `json:"name"`
+	FirstName      string `json:"firstName"`
+	LastName       string `json:"lastName"`
+	Email          string `json:"email"`
+	Phone          string `json:"phone"`
+	Affiliation    string `json:"affiliation"`
+	IdCard         string `json:"idCard"`
+	Region         string `json:"region"`
+	InvitationCode string `json:"invitationCode"`
+
+	Application string `json:"application"`
+	ClientId    string `json:"clientId"`
+	Provider    string `json:"provider"`
+	Code        string `json:"code"`
+	State       string `json:"state"`
+	RedirectUri string `json:"redirectUri"`
+	Method      string `json:"method"`
+
+	EmailCode   string `json:"emailCode"`
+	PhoneCode   string `json:"phoneCode"`
+	CountryCode string `json:"countryCode"`
+
+	AutoSignin bool `json:"autoSignin"`
+
+	RelayState   string `json:"relayState"`
+	SamlRequest  string `json:"samlRequest"`
+	SamlResponse string `json:"samlResponse"`
+
+	CaptchaType  string `json:"captchaType"`
+	CaptchaToken string `json:"captchaToken"`
+	ClientSecret string `json:"clientSecret"`
+
+	MfaType      string `json:"mfaType"`
+	Passcode     string `json:"passcode"`
+	RecoveryCode string `json:"recoveryCode"`
+
+	Plan    string `json:"plan"`
+	Pricing string `json:"pricing"`
+
+	FaceId []float64 `json:"faceId"`
+}
+
+func (c *Client) Login(form AuthForm) (string, error) {
+	postBytes, err := json.Marshal(form)
+	if err != nil {
+		return "", err
+	}
+
+	url := c.GetUrl("login", nil)
+	resp, err := c.DoPostJson(url, postBytes)
+	if err != nil {
+		return "", err
+	}
+
+	return resp.Data.(string), nil
 }
