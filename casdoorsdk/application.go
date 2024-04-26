@@ -173,13 +173,11 @@ func (c *Client) GetApplication(name string) (*Application, error) {
 }
 
 func (c *Client) AddApplication(application *Application) (bool, error) {
-	application.Owner = "admin"
 	_, affected, err := c.modifyApplication("add-application", application, nil)
 	return affected, err
 }
 
 func (c *Client) DeleteApplication(application *Application) (bool, error) {
-	application.Owner = "admin"
 	_, affected, err := c.modifyApplication("delete-application", application, nil)
 	return affected, err
 }

@@ -23,6 +23,8 @@ import (
 // modifyOrganization is an encapsulation of permission CUD(Create, Update, Delete) operations.
 // possible actions are `add-organization`, `update-organization`, `delete-organization`,
 func (c *Client) modifyOrganization(action string, organization *Organization, columns []string) (*Response, bool, error) {
+	organization.Owner = "admin"
+
 	queryMap := map[string]string{
 		"id": fmt.Sprintf("%s/%s", organization.Owner, organization.Name),
 	}
@@ -31,7 +33,6 @@ func (c *Client) modifyOrganization(action string, organization *Organization, c
 		queryMap["columns"] = strings.Join(columns, ",")
 	}
 
-	// organization.Owner = c.OrganizationName
 	postBytes, err := json.Marshal(organization)
 	if err != nil {
 		return nil, false, err
@@ -48,6 +49,8 @@ func (c *Client) modifyOrganization(action string, organization *Organization, c
 // modifyApplication is an encapsulation of permission CUD(Create, Update, Delete) operations.
 // possible actions are `add-application`, `update-application`, `delete-application`,
 func (c *Client) modifyApplication(action string, application *Application, columns []string) (*Response, bool, error) {
+	application.Owner = "admin"
+
 	queryMap := map[string]string{
 		"id": fmt.Sprintf("%s/%s", application.Owner, application.Name),
 	}
@@ -56,9 +59,6 @@ func (c *Client) modifyApplication(action string, application *Application, colu
 		queryMap["columns"] = strings.Join(columns, ",")
 	}
 
-	if application.Owner == "" {
-		application.Owner = "admin"
-	}
 	postBytes, err := json.Marshal(application)
 	if err != nil {
 		return nil, false, err
@@ -238,6 +238,37 @@ func (c *Client) modifyEnforcer(action string, enforcer *Enforcer, columns []str
 
 	enforcer.Owner = c.OrganizationName
 	postBytes, err := json.Marshal(enforcer)
+	if err != nil {
+		return nil, false, err
+	}
+
+	resp, err := c.DoPost(action, queryMap, postBytes, false, false)
+	if err != nil {
+		return nil, false, err
+	}
+
+	return resp, resp.Data == "Affected", nil
+}
+
+// modifyPolicy is an encapsulation of cert CUD(Create, Update, Delete) operations.
+func (c *Client) modifyPolicy(action string, enforcer *Enforcer, policies []*CasbinRule, columns []string) (*Response, bool, error) {
+	enforcer.Owner = c.OrganizationName
+	queryMap := map[string]string{
+		"id": fmt.Sprintf("%s/%s", enforcer.Owner, enforcer.Name),
+	}
+
+	if len(columns) != 0 {
+		queryMap["columns"] = strings.Join(columns, ",")
+	}
+
+	var postBytes []byte
+	var err error
+	if action == "update-policy" {
+		postBytes, err = json.Marshal(policies)
+	} else {
+		postBytes, err = json.Marshal(policies[0])
+	}
+
 	if err != nil {
 		return nil, false, err
 	}
@@ -475,6 +506,31 @@ func (c *Client) modifySyncer(action string, syncer *Syncer, columns []string) (
 	return resp, resp.Data == "Affected", nil
 }
 
+// modifyTransaction is an encapsulation of cert CUD(Create, Update, Delete) operations.
+// possible actions are `add-transaction`, `update-transaction`, `delete-transaction`,
+func (c *Client) modifyTransaction(action string, transaction *Transaction, columns []string) (*Response, bool, error) {
+	queryMap := map[string]string{
+		"id": fmt.Sprintf("%s/%s", transaction.Owner, transaction.Name),
+	}
+
+	if len(columns) != 0 {
+		queryMap["columns"] = strings.Join(columns, ",")
+	}
+
+	transaction.Owner = c.OrganizationName
+	postBytes, err := json.Marshal(transaction)
+	if err != nil {
+		return nil, false, err
+	}
+
+	resp, err := c.DoPost(action, queryMap, postBytes, false, false)
+	if err != nil {
+		return nil, false, err
+	}
+
+	return resp, resp.Data == "Affected", nil
+}
+
 // modifyWebhook is an encapsulation of cert CUD(Create, Update, Delete) operations.
 // possible actions are `add-webhook`, `update-webhook`, `delete-webhook`,
 func (c *Client) modifyWebhook(action string, webhook *Webhook, columns []string) (*Response, bool, error) {
@@ -503,6 +559,8 @@ func (c *Client) modifyWebhook(action string, webhook *Webhook, columns []string
 // modifyToken is an encapsulation of cert CUD(Create, Update, Delete) operations.
 // possible actions are `add-token`, `update-token`, `delete-token`,
 func (c *Client) modifyToken(action string, token *Token, columns []string) (*Response, bool, error) {
+	token.Owner = "admin"
+
 	queryMap := map[string]string{
 		"id": fmt.Sprintf("%s/%s", token.Owner, token.Name),
 	}
@@ -511,7 +569,6 @@ func (c *Client) modifyToken(action string, token *Token, columns []string) (*Re
 		queryMap["columns"] = strings.Join(columns, ",")
 	}
 
-	token.Owner = c.OrganizationName
 	postBytes, err := json.Marshal(token)
 	if err != nil {
 		return nil, false, err

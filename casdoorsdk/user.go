@@ -16,6 +16,7 @@ package casdoorsdk
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -60,6 +61,7 @@ type User struct {
 	UpdatedTime string `xorm:"varchar(100)" json:"updatedTime"`
 
 	Id                string   `xorm:"varchar(100) index" json:"id"`
+	ExternalId        string   `xorm:"varchar(100) index" json:"externalId"`
 	Type              string   `xorm:"varchar(100)" json:"type"`
 	Password          string   `xorm:"varchar(100)" json:"password"`
 	PasswordSalt      string   `xorm:"varchar(100)" json:"passwordSalt"`
@@ -274,15 +276,15 @@ func (c *Client) GetPaginationUsers(p int, pageSize int, queryMap map[string]str
 		return nil, 0, err
 	}
 
-	bytes, err := json.Marshal(response.Data)
+	dataBytes, err := json.Marshal(response.Data)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	var users []*User
-	err = json.Unmarshal(bytes, &users)
+	err = json.Unmarshal(dataBytes, &users)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, errors.New("response data format is incorrect")
 	}
 
 	return users, int(response.Data2.(float64)), nil
