@@ -32,7 +32,7 @@ type Group struct {
 	Type         string  `xorm:"varchar(100)" json:"type"`
 	ParentId     string  `xorm:"varchar(100)" json:"parentId"`
 	IsTopGroup   bool    `xorm:"bool" json:"isTopGroup"`
-	Users        []*User `xorm:"-" json:"users"`
+	Users        []string `xorm:"-" json:"users"`
 
 	Title    string   `json:"title,omitempty"`
 	Key      string   `json:"key,omitempty"`
