@@ -375,7 +375,7 @@ func (c *Client) GetUserByPhone(phone string) (*User, error) {
 
 func (c *Client) GetUserByUserId(userId string) (*User, error) {
 	queryMap := map[string]string{
-		"owner":  c.OrganizationName,
+		// "owner":  c.OrganizationName,
 		"userId": userId,
 	}
 
