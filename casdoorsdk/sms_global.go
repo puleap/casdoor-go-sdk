@@ -18,6 +18,6 @@ func SendSms(content string, receivers ...string) error {
 	return globalClient.SendSms(content, receivers...)
 }
 
-func VerifyCode(org string, name string, code string) error {
-	return globalClient.VerifyCode(org, name, code)
+func VerifyCode(org string, username string, code string) error {
+	return globalClient.VerifyCode(org, username, code)
 }

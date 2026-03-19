@@ -23,7 +23,7 @@ type smsForm struct {
 
 type VerifyCodeForm struct {
 	Organization string `json:"organization"`
-	Name         string `json:"name"`
+	Username     string `json:"username"`
 	Code         string `json:"code"`
 }
 
@@ -44,10 +44,10 @@ func (c *Client) SendSms(content string, receivers ...string) error {
 	return nil
 }
 
-func (c *Client) VerifyCode(org string, name string, code string) error {
+func (c *Client) VerifyCode(org string, username string, code string) error {
 	form := VerifyCodeForm{
 		Organization: org,
-		Name:         name,
+		Username:     username,
 		Code:         code,
 	}
 	postBytes, err := json.Marshal(form)
