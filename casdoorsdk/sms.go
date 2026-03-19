@@ -21,6 +21,12 @@ type smsForm struct {
 	Receivers []string `json:"receivers"`
 }
 
+type VerifyCodeForm struct {
+	Organization string `json:"organization"`
+	Name         string `json:"name"`
+	Code         string `json:"code"`
+}
+
 func (c *Client) SendSms(content string, receivers ...string) error {
 	form := smsForm{
 		Content:   content,
@@ -32,6 +38,24 @@ func (c *Client) SendSms(content string, receivers ...string) error {
 	}
 
 	_, err = c.DoPost("send-sms", nil, postBytes, false, false)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *Client) VerifyCode(org string, name string, code string) error {
+	form := VerifyCodeForm{
+		Organization: org,
+		Name:         name,
+		Code:         code,
+	}
+	postBytes, err := json.Marshal(form)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.DoPost("verify-code", nil, postBytes, false, false)
 	if err != nil {
 		return err
 	}
